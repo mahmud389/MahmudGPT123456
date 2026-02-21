@@ -36,6 +36,7 @@ import IDECanvas from './components/modes/IDECanvas';
 import ImageMode from './components/modes/ImageMode';
 import ResearchMode from './components/modes/ResearchMode';
 import LiveMode from './components/modes/LiveMode';
+import LandingPage from './components/LandingPage';
 
 export default function App() {
   const [mode, setMode] = useState<Mode>('chat');
@@ -44,6 +45,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
   const [threads, setThreads] = useState<Thread[]>([]);
+  const [showLanding, setShowLanding] = useState(true);
 
   useEffect(() => {
     if (user) {
@@ -54,6 +56,7 @@ export default function App() {
   const handleNewThread = () => {
     setCurrentThreadId(null);
     setMode('chat');
+    setShowLanding(false);
   };
 
   const handleDeleteThread = async (id: string, e: React.MouseEvent) => {
@@ -126,26 +129,28 @@ export default function App() {
             {isSidebarOpen && <span>New Chat</span>}
           </button>
 
-          <NavItem icon={MessageSquare} label="Chat" active={mode === 'chat'} onClick={() => setMode('chat')} isOpen={isSidebarOpen} />
-          <NavItem icon={PenTool} label="Writing" active={mode === 'writing'} onClick={() => setMode('writing')} isOpen={isSidebarOpen} />
-          <NavItem icon={Code2} label="IDE Canvas" active={mode === 'ide'} onClick={() => setMode('ide')} isOpen={isSidebarOpen} />
-          <NavItem icon={Search} label="Research" active={mode === 'research'} onClick={() => setMode('research')} isOpen={isSidebarOpen} />
-          <NavItem icon={ImageIcon} label="Image Gen" active={mode === 'image'} onClick={() => setMode('image')} isOpen={isSidebarOpen} />
-          <NavItem icon={Monitor} label="Live Mode" active={mode === 'live'} onClick={() => setMode('live')} isOpen={isSidebarOpen} />
+          <NavItem icon={LayoutDashboard} label="Dashboard" active={showLanding} onClick={() => setShowLanding(true)} isOpen={isSidebarOpen} />
+          <div className="h-px bg-white/5 my-2 mx-3" />
+          <NavItem icon={MessageSquare} label="Chat" active={mode === 'chat' && !showLanding} onClick={() => { setMode('chat'); setShowLanding(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={PenTool} label="Writing" active={mode === 'writing' && !showLanding} onClick={() => { setMode('writing'); setShowLanding(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={Code2} label="IDE Canvas" active={mode === 'ide' && !showLanding} onClick={() => { setMode('ide'); setShowLanding(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={Search} label="Research" active={mode === 'research' && !showLanding} onClick={() => { setMode('research'); setShowLanding(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={ImageIcon} label="Image Gen" active={mode === 'image' && !showLanding} onClick={() => { setMode('image'); setShowLanding(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={Monitor} label="Live Mode" active={mode === 'live' && !showLanding} onClick={() => { setMode('live'); setShowLanding(false); }} isOpen={isSidebarOpen} />
           
           {isSidebarOpen && threads.length > 0 && (
             <div className="mt-8 px-3">
               <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Recent Activity</p>
               <div className="space-y-2">
                 {threads.map(thread => (
-                  <button 
+                  <div 
                     key={thread.id}
                     onClick={() => {
                       setCurrentThreadId(thread.id);
                       setMode(thread.mode);
                     }}
                     className={cn(
-                      "w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-all group",
+                      "w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-all group cursor-pointer",
                       currentThreadId === thread.id ? "bg-white/10 text-white" : "text-zinc-500 hover:text-zinc-300 hover:bg-white/5"
                     )}
                   >
@@ -157,7 +162,7 @@ export default function App() {
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -218,34 +223,40 @@ export default function App() {
         </header>
 
         <div className="flex-1 overflow-hidden relative flex">
-          {/* Integrated Chat Sidebar (Always present) */}
-          <div className={cn(
-            "border-r border-white/5 overflow-hidden transition-all duration-300",
-            mode === 'chat' ? "w-full" : "w-80 hidden xl:block"
-          )}>
-            <ChatMode user={user} threadId={currentThreadId} />
-          </div>
+          {showLanding ? (
+            <LandingPage onStart={(m) => { setMode(m); setShowLanding(false); }} />
+          ) : (
+            <>
+              {/* Integrated Chat Sidebar (Always present) */}
+              <div className={cn(
+                "border-r border-white/5 overflow-hidden transition-all duration-300",
+                mode === 'chat' ? "w-full" : "w-80 hidden xl:block"
+              )}>
+                <ChatMode user={user} threadId={currentThreadId} />
+              </div>
 
-          {/* Mode Canvas */}
-          {mode !== 'chat' && (
-            <div className="flex-1 overflow-hidden relative">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={mode}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.02 }}
-                  transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-                  className="h-full w-full"
-                >
-                  {mode === 'writing' && <WritingCanvas user={user} />}
-                  {mode === 'ide' && <IDECanvas user={user} />}
-                  {mode === 'image' && <ImageMode user={user} />}
-                  {mode === 'research' && <ResearchMode user={user} />}
-                  {mode === 'live' && <LiveMode user={user} />}
-                </motion.div>
-              </AnimatePresence>
-            </div>
+              {/* Mode Canvas */}
+              {mode !== 'chat' && (
+                <div className="flex-1 overflow-hidden relative">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={mode}
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 1.02 }}
+                      transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                      className="h-full w-full"
+                    >
+                      {mode === 'writing' && <WritingCanvas user={user} />}
+                      {mode === 'ide' && <IDECanvas user={user} />}
+                      {mode === 'image' && <ImageMode user={user} />}
+                      {mode === 'research' && <ResearchMode user={user} />}
+                      {mode === 'live' && <LiveMode user={user} />}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              )}
+            </>
           )}
         </div>
 

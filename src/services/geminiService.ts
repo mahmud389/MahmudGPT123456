@@ -13,13 +13,7 @@ export const chatWithGemini = async (
     attachments?: Attachment[]
   } = {}
 ) => {
-  // 1. Check usage
-  const limitCheck = await axios.get('/api/usage/check?type=message');
-  if (!limitCheck.data.allowed) {
-    throw new Error("Daily limit reached. Upgrade to PRO!");
-  }
-
-  // 2. Call Gemini
+  // 1. Call Gemini
   const ai = getAI();
   const modelName = MODEL_ALIASES[options.model || 'gpm-4.0-fast'];
   
@@ -48,9 +42,6 @@ export const chatWithGemini = async (
   const text = response.text;
   if (!text) throw new Error("No response from AI");
 
-  // 3. Increment usage
-  await axios.post('/api/usage/increment', { type: 'message' });
-
   return text;
 };
 
@@ -76,13 +67,7 @@ export const generateSpeech = async (text: string, voice: 'Puck' | 'Charon' | 'K
 };
 
 export const generateImageWithGemini = async (prompt: string, options: { aspectRatio?: string, imageSize?: string } = {}) => {
-  // 1. Check usage
-  const limitCheck = await axios.get('/api/usage/check?type=image');
-  if (!limitCheck.data.allowed) {
-    throw new Error("Daily image limit reached.");
-  }
-
-  // 2. Call Gemini
+  // 1. Call Gemini
   const ai = getAI();
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash-image',
@@ -103,9 +88,6 @@ export const generateImageWithGemini = async (prompt: string, options: { aspectR
   }
 
   if (!imageUrl) throw new Error("Failed to generate image");
-
-  // 3. Increment usage
-  await axios.post('/api/usage/increment', { type: 'image' });
 
   return imageUrl;
 };

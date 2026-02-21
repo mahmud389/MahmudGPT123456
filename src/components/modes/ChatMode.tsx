@@ -39,7 +39,7 @@ export default function ChatMode({ user, threadId }: { user: User | null, thread
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showThinking, setShowThinking] = useState(true);
-  const [selectedModel, setSelectedModel] = useState<keyof typeof MODEL_ALIASES>('gpm-5.5-thinks');
+  const [selectedModel, setSelectedModel] = useState<keyof typeof MODEL_ALIASES>('gpm-4.0-fast');
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [isSpeaking, setIsSpeaking] = useState<string | null>(null);
   const [autoTTS, setAutoTTS] = useState(false);
