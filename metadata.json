@@ -1,0 +1,9 @@
+{
+  "name": "Remix: MahmudGPT PROMIX+",
+  "description": "Pro Multi-Model Intelligent Exchange platform featuring Chat, Writing Canvas, IDE, Research, and Image Generation powered by Gemini.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}

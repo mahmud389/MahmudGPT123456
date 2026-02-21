@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600;700&family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-bengali: "Hind Siliguri", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-[#050505] text-zinc-100 selection:bg-emerald-500/30;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+  
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-2xl border border-white/5;
+  }
+
+  .rgb-border {
+    position: relative;
+    z-index: 0;
+  }
+
+  .rgb-border::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 2px; /* Border width */
+    background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+    background-size: 400%;
+    -webkit-mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    z-index: -1;
+    animation: rgb-anim 10s linear infinite;
+    border-radius: inherit;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  @keyframes rgb-anim {
+    0% { background-position: 0 0; }
+    50% { background-position: 400% 0; }
+    100% { background-position: 0 0; }
+  }
+
+  .shiny-text {
+    background: linear-gradient(90deg, #fff, #555, #fff);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shine 3s linear infinite;
+  }
+
+  @keyframes shine {
+    to { background-position: 200% center; }
+  }
+}
+
+.prose pre {
+  background-color: #0a0a0a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  @apply shadow-2xl;
+}
+
+.prose code {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.05);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+.prose code::before, .prose code::after {
+  content: "";
+}
+
+/* Bengali support */
+[lang="bn"] {
+  font-family: var(--font-bengali);
+}
+
