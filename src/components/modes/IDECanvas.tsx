@@ -53,37 +53,37 @@ export default function IDECanvas({ user }: { user: User | null }) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Toolbar */}
-      <div className="h-12 border-b border-white/5 bg-[#0a0a0a] flex items-center justify-between px-4">
-        <div className="flex items-center gap-4">
+      <div className="h-auto min-h-[3rem] border-b border-white/5 bg-[#0a0a0a] flex flex-wrap items-center justify-between px-4 py-2 gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <FileCode className="w-4 h-4 text-emerald-500" />
             <select 
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              className="bg-transparent border-none text-xs font-medium focus:ring-0 text-zinc-300 cursor-pointer hover:text-white"
+              className="bg-transparent border-none text-[10px] font-black uppercase tracking-widest focus:ring-0 text-zinc-300 cursor-pointer hover:text-white transition-colors"
             >
               {LANGUAGES.map(l => <option key={l.id} value={l.id} className="bg-[#0a0a0a]">{l.label}</option>)}
             </select>
           </div>
-          <div className="h-4 w-px bg-white/10" />
-          <div className="flex items-center gap-1">
+          <div className="h-4 w-px bg-white/10 hidden sm:block" />
+          <div className="flex items-center gap-1 flex-wrap">
             <button 
               onClick={() => handleAIAction('Explain')}
-              className="px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-zinc-500 hover:bg-white/5 hover:text-white transition-all flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:bg-white/5 hover:text-white transition-all flex items-center gap-1.5"
             >
               <Sparkles className="w-3 h-3" />
               Explain
             </button>
             <button 
               onClick={() => handleAIAction('Debug')}
-              className="px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-zinc-500 hover:bg-white/5 hover:text-white transition-all flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:bg-white/5 hover:text-white transition-all flex items-center gap-1.5"
             >
               <Bug className="w-3 h-3" />
               Debug
             </button>
             <button 
               onClick={() => handleAIAction('Refactor')}
-              className="px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-zinc-500 hover:bg-white/5 hover:text-white transition-all flex items-center gap-1.5"
+              className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:bg-white/5 hover:text-white transition-all flex items-center gap-1.5"
             >
               <Zap className="w-3 h-3" />
               Refactor
@@ -92,16 +92,16 @@ export default function IDECanvas({ user }: { user: User | null }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-white/5 rounded-lg text-zinc-400 transition-colors">
+          <button className="p-2 hover:bg-white/5 rounded-xl text-zinc-400 transition-colors">
             <Download className="w-4 h-4" />
           </button>
           <button 
             onClick={handleRun}
             disabled={isRunning}
-            className="flex items-center gap-2 px-4 py-1.5 bg-emerald-500 text-black rounded-lg font-bold text-xs hover:bg-emerald-400 transition-all disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-black rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-400 transition-all disabled:opacity-50 shadow-lg shadow-emerald-500/20"
           >
             {isRunning ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3 fill-current" />}
-            Run
+            Run Code
           </button>
         </div>
       </div>

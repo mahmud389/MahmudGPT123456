@@ -23,7 +23,9 @@ import {
   History,
   LayoutDashboard,
   Monitor,
-  Trash2
+  Trash2,
+  Menu,
+  X
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import axios from 'axios';
@@ -57,6 +59,11 @@ export default function App() {
     setCurrentThreadId(null);
     setMode('chat');
     setShowLanding(false);
+    if (window.innerWidth < 768) setIsSidebarOpen(false);
+  };
+
+  const onThreadCreated = (id: string) => {
+    setCurrentThreadId(id);
   };
 
   const handleDeleteThread = async (id: string, e: React.MouseEvent) => {
@@ -92,11 +99,30 @@ export default function App() {
 
   return (
     <div className="h-screen w-screen bg-[#050505] text-zinc-100 flex overflow-hidden font-sans">
+      {/* Sidebar Overlay for Mobile */}
+      <AnimatePresence>
+        {isSidebarOpen && window.innerWidth < 768 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[45]"
+          />
+        )}
+      </AnimatePresence>
+
       {/* Sidebar */}
       <motion.aside
         initial={false}
-        animate={{ width: isSidebarOpen ? 280 : 80 }}
-        className="h-full bg-[#0a0a0a] border-r border-white/5 flex flex-col relative z-50 shadow-2xl"
+        animate={{ 
+          width: isSidebarOpen ? (window.innerWidth < 768 ? '100%' : 280) : (window.innerWidth < 768 ? 0 : 80),
+          x: !isSidebarOpen && window.innerWidth < 768 ? -280 : 0
+        }}
+        className={cn(
+          "h-full bg-[#0a0a0a] border-r border-white/5 flex flex-col relative z-50 shadow-2xl overflow-hidden",
+          window.innerWidth < 768 && "fixed left-0 top-0 bottom-0"
+        )}
       >
         <div className="p-6 flex items-center justify-between">
           {isSidebarOpen ? (
@@ -129,14 +155,14 @@ export default function App() {
             {isSidebarOpen && <span>New Chat</span>}
           </button>
 
-          <NavItem icon={LayoutDashboard} label="Dashboard" active={showLanding} onClick={() => setShowLanding(true)} isOpen={isSidebarOpen} />
+          <NavItem icon={LayoutDashboard} label="Dashboard" active={showLanding} onClick={() => { setShowLanding(true); if (window.innerWidth < 768) setIsSidebarOpen(false); }} isOpen={isSidebarOpen} />
           <div className="h-px bg-white/5 my-2 mx-3" />
-          <NavItem icon={MessageSquare} label="Chat" active={mode === 'chat' && !showLanding} onClick={() => { setMode('chat'); setShowLanding(false); }} isOpen={isSidebarOpen} />
-          <NavItem icon={PenTool} label="Writing" active={mode === 'writing' && !showLanding} onClick={() => { setMode('writing'); setShowLanding(false); }} isOpen={isSidebarOpen} />
-          <NavItem icon={Code2} label="IDE Canvas" active={mode === 'ide' && !showLanding} onClick={() => { setMode('ide'); setShowLanding(false); }} isOpen={isSidebarOpen} />
-          <NavItem icon={Search} label="Research" active={mode === 'research' && !showLanding} onClick={() => { setMode('research'); setShowLanding(false); }} isOpen={isSidebarOpen} />
-          <NavItem icon={ImageIcon} label="Image Gen" active={mode === 'image' && !showLanding} onClick={() => { setMode('image'); setShowLanding(false); }} isOpen={isSidebarOpen} />
-          <NavItem icon={Monitor} label="Live Mode" active={mode === 'live' && !showLanding} onClick={() => { setMode('live'); setShowLanding(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={MessageSquare} label="Chat" active={mode === 'chat' && !showLanding} onClick={() => { setMode('chat'); setShowLanding(false); if (window.innerWidth < 768) setIsSidebarOpen(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={PenTool} label="Writing" active={mode === 'writing' && !showLanding} onClick={() => { setMode('writing'); setShowLanding(false); if (window.innerWidth < 768) setIsSidebarOpen(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={Code2} label="IDE Canvas" active={mode === 'ide' && !showLanding} onClick={() => { setMode('ide'); setShowLanding(false); if (window.innerWidth < 768) setIsSidebarOpen(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={Search} label="Research" active={mode === 'research' && !showLanding} onClick={() => { setMode('research'); setShowLanding(false); if (window.innerWidth < 768) setIsSidebarOpen(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={ImageIcon} label="Image Gen" active={mode === 'image' && !showLanding} onClick={() => { setMode('image'); setShowLanding(false); if (window.innerWidth < 768) setIsSidebarOpen(false); }} isOpen={isSidebarOpen} />
+          <NavItem icon={Monitor} label="Live Mode" active={mode === 'live' && !showLanding} onClick={() => { setMode('live'); setShowLanding(false); if (window.innerWidth < 768) setIsSidebarOpen(false); }} isOpen={isSidebarOpen} />
           
           {isSidebarOpen && threads.length > 0 && (
             <div className="mt-8 px-3">
@@ -148,6 +174,8 @@ export default function App() {
                     onClick={() => {
                       setCurrentThreadId(thread.id);
                       setMode(thread.mode);
+                      setShowLanding(false);
+                      if (window.innerWidth < 768) setIsSidebarOpen(false);
                     }}
                     className={cn(
                       "w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-all group cursor-pointer",
@@ -195,15 +223,24 @@ export default function App() {
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 relative flex flex-col overflow-hidden rgb-border">
-        <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-[#050505]/80 backdrop-blur-md z-40">
+      <main className="flex-1 relative flex flex-col overflow-hidden">
+        <header className="h-16 border-b border-white/5 flex items-center justify-between px-4 md:px-8 bg-[#050505]/80 backdrop-blur-md z-40">
           <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className={cn(
+                "p-2 hover:bg-white/5 rounded-xl text-zinc-400 md:hidden",
+                isSidebarOpen && "hidden"
+              )}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-zinc-100 capitalize tracking-tight">{mode}</h2>
-              <div className="h-3 w-px bg-white/10" />
+              <h2 className="text-sm font-bold text-zinc-100 capitalize tracking-tight hidden sm:block">{mode}</h2>
+              <div className="h-3 w-px bg-white/10 hidden sm:block" />
               <div className="flex items-center gap-2 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                <span className="text-[10px] uppercase tracking-widest text-emerald-500 font-black">GPM 5.5 THINKS</span>
+                <span className="text-[10px] uppercase tracking-widest text-emerald-500 font-black">GPM 5.5 PROMIX</span>
               </div>
             </div>
           </div>
@@ -232,7 +269,7 @@ export default function App() {
                 "border-r border-white/5 overflow-hidden transition-all duration-300",
                 mode === 'chat' ? "w-full" : "w-80 hidden xl:block"
               )}>
-                <ChatMode user={user} threadId={currentThreadId} />
+                <ChatMode user={user} threadId={currentThreadId} onThreadCreated={onThreadCreated} />
               </div>
 
               {/* Mode Canvas */}

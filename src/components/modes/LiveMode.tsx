@@ -30,8 +30,8 @@ export default function LiveMode({ user }: { user: User | null }) {
   };
 
   return (
-    <div className="h-full flex flex-col items-center justify-center p-8 bg-[#050505]">
-      <div className="max-w-4xl w-full flex flex-col items-center space-y-12">
+    <div className="h-full flex flex-col items-center justify-center p-4 md:p-8 bg-[#050505] overflow-y-auto scrollbar-hide">
+      <div className="max-w-4xl w-full flex flex-col items-center space-y-8 md:space-y-12">
         {/* Visualizer */}
         <div className="flex items-center justify-center gap-1.5 h-48 w-full">
           {visualizerData.map((val, i) => (

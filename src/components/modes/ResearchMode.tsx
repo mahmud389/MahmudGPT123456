@@ -62,9 +62,9 @@ export default function ResearchMode({ user }: { user: User | null }) {
         </motion.div>
       </div>
 
-      <div className="flex-1 flex gap-8 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row gap-8 overflow-hidden">
         {/* Summary */}
-        <div className="flex-1 overflow-y-auto pr-4 space-y-6">
+        <div className="flex-1 overflow-y-auto pr-0 lg:pr-4 space-y-6 scrollbar-hide">
           {summary ? (
             <motion.div 
               initial={{ opacity: 0 }}
@@ -96,7 +96,7 @@ export default function ResearchMode({ user }: { user: User | null }) {
         </div>
 
         {/* Sources */}
-        <div className="w-80 flex flex-col gap-4 overflow-y-auto">
+        <div className="w-full lg:w-80 flex flex-col gap-4 overflow-y-auto scrollbar-hide">
           <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 px-2">Key Sources</h3>
           {results.map((res, i) => (
             <motion.a

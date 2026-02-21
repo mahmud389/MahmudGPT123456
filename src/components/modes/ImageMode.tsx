@@ -50,7 +50,7 @@ export default function ImageMode({ user }: { user: User | null }) {
   return (
     <div className="h-full flex flex-col lg:flex-row overflow-hidden">
       {/* Controls */}
-      <div className="w-full lg:w-80 border-r border-white/5 bg-[#0a0a0a] p-6 space-y-8 overflow-y-auto">
+      <div className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-white/5 bg-[#0a0a0a] p-6 space-y-8 overflow-y-auto scrollbar-hide">
         <div className="space-y-4">
           <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Prompt</label>
           <textarea

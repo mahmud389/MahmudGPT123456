@@ -34,7 +34,7 @@ import 'katex/dist/katex.min.css';
 import { cn } from '../../lib/utils';
 import { User, Message, Thread, Attachment, MODEL_ALIASES } from '../../types';
 
-export default function ChatMode({ user, threadId }: { user: User | null, threadId: string | null }) {
+export default function ChatMode({ user, threadId, onThreadCreated }: { user: User | null, threadId: string | null, onThreadCreated?: (id: string) => void }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +45,7 @@ export default function ChatMode({ user, threadId }: { user: User | null, thread
   const [autoTTS, setAutoTTS] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     if (threadId) {
@@ -89,6 +90,7 @@ export default function ChatMode({ user, threadId }: { user: User | null, thread
         title: input.slice(0, 30) || "New Chat",
         mode: 'chat'
       });
+      onThreadCreated?.(currentThreadId);
     }
 
     const userMsg: Message = {
@@ -282,10 +284,10 @@ export default function ChatMode({ user, threadId }: { user: User | null, thread
         )}
       </div>
 
-      <div className="pb-8 pt-4 sticky bottom-0 bg-gradient-to-t from-[#050505] via-[#050505] to-transparent">
+      <div className="pb-8 pt-4 sticky bottom-0 bg-gradient-to-t from-[#050505] via-[#050505] to-transparent z-10">
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 via-cyan-500 to-emerald-500 rounded-[2rem] blur-xl opacity-10 group-focus-within:opacity-30 transition duration-1000 animate-pulse" />
-          <div className="relative bg-[#0a0a0a]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-3 flex flex-col gap-3 shadow-2xl">
+          <div className="relative bg-[#0a0a0a]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-2 flex flex-col gap-2 shadow-2xl">
             
             {attachments.length > 0 && (
               <div className="flex flex-wrap gap-2 px-3 pt-2">
@@ -300,44 +302,42 @@ export default function ChatMode({ user, threadId }: { user: User | null, thread
               </div>
             )}
 
-            <div className="flex items-center justify-between px-3">
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <select 
-                    value={selectedModel}
-                    onChange={(e) => setSelectedModel(e.target.value as any)}
-                    className="appearance-none bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-500 cursor-pointer hover:bg-white/10 transition-all pr-8"
-                  >
-                    <option value="gpm-5.5-thinks">GPM 5.5 THINKS</option>
-                    <option value="gpm-4.0-fast">GPM 4.0 FAST</option>
-                    <option value="gpm-vision">GPM VISION</option>
-                  </select>
-                  <ChevronDown className="w-3 h-3 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-500" />
-                </div>
-                <div className="h-4 w-px bg-white/10" />
-                <button 
-                  onClick={() => setShowThinking(!showThinking)}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                    showThinking ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/30" : "bg-white/5 text-zinc-500 border border-white/5"
-                  )}
+            <div className="flex flex-wrap items-center gap-2 px-3">
+              <div className="relative">
+                <select 
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value as any)}
+                  className="appearance-none bg-white/5 border border-white/10 rounded-xl px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-emerald-500 cursor-pointer hover:bg-white/10 transition-all pr-8"
                 >
-                  <Brain className="w-3.5 h-3.5" />
-                  Neural Thinking: {showThinking ? 'ON' : 'OFF'}
-                </button>
-                <div className="h-4 w-px bg-white/10" />
-                <button 
-                  onClick={() => setAutoTTS(!autoTTS)}
-                  className={cn(
-                    "flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                    autoTTS ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/30" : "bg-white/5 text-zinc-500 border border-white/5"
-                  )}
-                >
-                  <Volume2 className="w-3.5 h-3.5" />
-                  Auto TTS: {autoTTS ? 'ON' : 'OFF'}
-                </button>
+                  <option value="gpm-5.5-thinks">GPM 5.5 THINKS</option>
+                  <option value="gpm-4.0-fast">GPM 4.0 FAST</option>
+                  <option value="gpm-vision">GPM VISION</option>
+                </select>
+                <ChevronDown className="w-3 h-3 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-500" />
               </div>
+              <button 
+                onClick={() => setShowThinking(!showThinking)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                  showThinking ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/30" : "bg-white/5 text-zinc-500 border border-white/5"
+                )}
+              >
+                <Brain className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Neural Thinking:</span> {showThinking ? 'ON' : 'OFF'}
+              </button>
+              <button 
+                onClick={() => setAutoTTS(!autoTTS)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                  autoTTS ? "bg-emerald-500/20 text-emerald-500 border border-emerald-500/30" : "bg-white/5 text-zinc-500 border border-white/5"
+                )}
+              >
+                <Volume2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Auto TTS:</span> {autoTTS ? 'ON' : 'OFF'}
+              </button>
               
+              <div className="flex-1" />
+
               <div className="flex items-center gap-2">
                 <input 
                   type="file" 
@@ -348,9 +348,9 @@ export default function ChatMode({ user, threadId }: { user: User | null, thread
                 />
                 <button 
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-2.5 rounded-xl glass hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
+                  className="p-2 rounded-xl glass hover:bg-white/10 text-zinc-400 hover:text-white transition-all"
                 >
-                  <Paperclip className="w-5 h-5" />
+                  <Paperclip className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -366,13 +366,13 @@ export default function ChatMode({ user, threadId }: { user: User | null, thread
                   }
                 }}
                 placeholder="Message MAHMUDGPT+..."
-                className="flex-1 bg-transparent border-none focus:ring-0 text-[15px] resize-none py-2 max-h-60 min-h-[48px] placeholder:text-zinc-600"
+                className="flex-1 bg-transparent border-none focus:ring-0 text-[15px] resize-none py-2 max-h-60 min-h-[44px] placeholder:text-zinc-600"
                 rows={1}
               />
               <button 
                 onClick={handleSend}
                 disabled={(!input.trim() && attachments.length === 0) || isLoading}
-                className="p-3.5 bg-emerald-500 text-black rounded-2xl hover:bg-emerald-400 disabled:opacity-50 disabled:hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
+                className="p-3 bg-emerald-500 text-black rounded-2xl hover:bg-emerald-400 disabled:opacity-50 disabled:hover:bg-emerald-500 transition-all shadow-lg shadow-emerald-500/20 active:scale-95 flex-shrink-0"
               >
                 <Send className="w-5 h-5" />
               </button>

@@ -37,18 +37,18 @@ export default function WritingCanvas({ user }: { user: User | null }) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       {/* Toolbar */}
-      <div className="h-12 border-b border-white/5 bg-[#0a0a0a] flex items-center justify-between px-4">
-        <div className="flex items-center gap-4">
+      <div className="h-auto min-h-[3rem] border-b border-white/5 bg-[#0a0a0a] flex flex-wrap items-center justify-between px-4 py-2 gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <div className="flex bg-zinc-900 rounded-lg p-1">
             <ViewButton active={view === 'edit'} onClick={() => setView('edit')} icon={Edit3} label="Edit" />
-            <ViewButton active={view === 'split'} onClick={() => setView('split')} icon={FileText} label="Split" />
+            <ViewButton active={view === 'split'} onClick={() => setView('split')} icon={FileText} label="Split" className="hidden sm:flex" />
             <ViewButton active={view === 'preview'} onClick={() => setView('preview')} icon={Eye} label="Preview" />
           </div>
-          <div className="h-4 w-px bg-white/10" />
+          <div className="h-4 w-px bg-white/10 hidden sm:block" />
           <button 
             onClick={handleAIImprove}
             disabled={isGenerating}
-            className="flex items-center gap-2 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-emerald-500 hover:bg-emerald-500/10 transition-all"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/5 border border-emerald-500/20 hover:bg-emerald-500/10 transition-all"
           >
             {isGenerating ? <Sparkles className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
             AI Improve
@@ -56,14 +56,14 @@ export default function WritingCanvas({ user }: { user: User | null }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+          <div className="text-[10px] font-black font-mono text-zinc-500 uppercase tracking-widest">
             {wordCount} Words
           </div>
           <div className="h-4 w-px bg-white/10" />
-          <button className="p-2 hover:bg-white/5 rounded-lg text-zinc-400">
+          <button className="p-2 hover:bg-white/5 rounded-xl text-zinc-400 transition-colors">
             <Save className="w-4 h-4" />
           </button>
-          <button className="p-2 hover:bg-white/5 rounded-lg text-zinc-400">
+          <button className="p-2 hover:bg-white/5 rounded-xl text-zinc-400 transition-colors">
             <Download className="w-4 h-4" />
           </button>
         </div>
@@ -104,13 +104,14 @@ export default function WritingCanvas({ user }: { user: User | null }) {
   );
 }
 
-function ViewButton({ active, onClick, icon: Icon, label }: { active: boolean, onClick: () => void, icon: any, label: string }) {
+function ViewButton({ active, onClick, icon: Icon, label, className }: { active: boolean, onClick: () => void, icon: any, label: string, className?: string }) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all",
-        active ? "bg-white/10 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300"
+        "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-black uppercase tracking-widest transition-all",
+        active ? "bg-white/10 text-white shadow-sm" : "text-zinc-500 hover:text-zinc-300",
+        className
       )}
     >
       <Icon className="w-3 h-3" />
